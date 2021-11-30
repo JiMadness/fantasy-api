@@ -2,7 +2,7 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript soccer manager game API.
 
-## Installation
+## Dependencies installation
 
 ```bash
 $ npm install

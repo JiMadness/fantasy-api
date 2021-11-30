@@ -1,6 +1,6 @@
 import { Document, Schema as MongooseSchema } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Player } from './player.schema';
+import { Player } from '../team/player/player.schema';
 
 export type MarketDocument = Market & Document;
 

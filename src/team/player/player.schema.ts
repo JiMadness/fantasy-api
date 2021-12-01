@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { PlayerPosition } from './player-position.enum';
 import { getCodes } from 'country-list';
@@ -7,6 +7,8 @@ export type PlayerDocument = Player & Document;
 
 @Schema()
 export class Player {
+  _id!: MongooseSchema.Types.ObjectId;
+
   @Prop({ required: true })
   firstName: string;
 

@@ -1,7 +1,7 @@
-import { IsNotEmpty } from 'class-validator';
-import { Schema } from 'mongoose';
+import { IsInstance } from 'class-validator';
+import { Player, PlayerDocument } from '../player.schema';
 
 export class EnhancePlayerValueDto {
-  @IsNotEmpty()
-  playerId: Schema.Types.ObjectId;
+  @IsInstance(Player)
+  player: PlayerDocument;
 }

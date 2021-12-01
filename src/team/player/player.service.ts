@@ -7,6 +7,7 @@ import { names, uniqueNamesGenerator } from 'unique-names-generator';
 import { getCode, getNames } from 'country-list';
 import { PlayerPosition } from './player-position.enum';
 import { EnhancePlayerValueDto } from './dto/enhance-player-value.dto';
+import { UpdatePlayerDto } from './dto/update-player.dto';
 
 @Injectable()
 export class PlayerService {
@@ -98,15 +99,27 @@ export class PlayerService {
   }
 
   async enhancePlayerValue(enhancePlayerValueDto: EnhancePlayerValueDto): Promise<PlayerDocument> {
-    const player = await this.playerModel.findById(enhancePlayerValueDto.playerId).then((player) => {
-      if (!player) {
-        throw new Error('Player not found.');
-      }
-
-      return player;
-    });
+    const player = enhancePlayerValueDto.player;
 
     player.value += Math.random() * player.value;
+
+    return player.save();
+  }
+
+  async updatePlayer(updatePlayerDto: UpdatePlayerDto): Promise<PlayerDocument> {
+    const player = updatePlayerDto.player;
+
+    if (updatePlayerDto.firstName) {
+      player.firstName = updatePlayerDto.firstName;
+    }
+
+    if (updatePlayerDto.lastName) {
+      player.lastName = updatePlayerDto.lastName;
+    }
+
+    if (updatePlayerDto.firstName) {
+      player.country = getCode(updatePlayerDto.country);
+    }
 
     return player.save();
   }

@@ -1,19 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Team, TeamDocument } from './team.schema';
-import { Model } from 'mongoose';
+import { Connection, Model } from 'mongoose';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { PlayerService } from '../player/player.service';
 import { ConfigService } from '@nestjs/config';
 import { getCode } from 'country-list';
 import { GetTeamByEmailDto } from './dto/get-team-by-email.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
+import { TransferTeamPlayerDto } from './dto/transfer-team-player.dto';
 
 @Injectable()
 export class TeamService {
   private readonly initialTeamBalance: number;
 
-  constructor(@InjectModel(Team.name) private teamModel: Model<TeamDocument>,
+  constructor(@InjectConnection() private connection: Connection,
+              @InjectModel(Team.name) private teamModel: Model<TeamDocument>,
               private configService: ConfigService,
               private playerService: PlayerService) {
     this.initialTeamBalance = configService.get<number>('TEAM_INITIAL_BALANCE');
@@ -31,17 +33,24 @@ export class TeamService {
   }
 
   async getTeamByEmail(getTeamByEmailDto: GetTeamByEmailDto): Promise<TeamDocument> {
+    let teamPromise = this.teamModel.findById(getTeamByEmailDto.email),
+      team;
+
     if (getTeamByEmailDto.getPassword) {
-      return this.teamModel.findById(getTeamByEmailDto.email).select('+password');
+      teamPromise = teamPromise.select('+password');
     }
 
-    return this.teamModel.findById(getTeamByEmailDto.email).then((team) => {
-      if (!team) {
-        throw new Error('Team not found.');
-      }
+    if (getTeamByEmailDto.session) {
+      teamPromise = teamPromise.session(getTeamByEmailDto.session);
+    }
 
-      return team;
-    });
+    team = await teamPromise;
+
+    if (!team) {
+      throw new Error('Team not found.');
+    }
+
+    return team;
   }
 
   async updateTeam(updateTeamDto: UpdateTeamDto): Promise<TeamDocument> {
@@ -60,5 +69,49 @@ export class TeamService {
     }
 
     return team.save();
+  }
+
+  async transferTeamPlayer(transferTeamPlayerDto: TransferTeamPlayerDto): Promise<TeamDocument> {
+    const transactionSession = await this.connection.startSession();
+
+    let sourcePlayer,
+      destinationTeam;
+
+    await transactionSession.withTransaction(async () => {
+      const sourceTeam = await this.getTeamByEmail({
+        email: transferTeamPlayerDto.sourceTeamEmail,
+        session: transactionSession,
+      });
+      // @ts-expect-error
+      sourcePlayer = sourceTeam.players.find((player) => player._id.equals(transferTeamPlayerDto.playerId));
+
+      if (!sourcePlayer) {
+        throw new Error('Player not found in team.');
+      }
+
+      destinationTeam = await this.getTeamByEmail({
+        email: transferTeamPlayerDto.destinationTeamEmail,
+        session: transactionSession,
+      });
+
+      if (sourceTeam.equals(destinationTeam)) {
+        throw new Error('Cannot transfer player to own team.');
+      }
+
+      // @ts-expect-error
+      sourceTeam.players = sourceTeam.players.filter((player) => !player._id.equals(sourcePlayer._id));
+      destinationTeam.players.push(sourcePlayer);
+      sourceTeam.balance += transferTeamPlayerDto.sellPrice;
+      destinationTeam.balance -= transferTeamPlayerDto.sellPrice;
+
+      await sourceTeam.save();
+      await destinationTeam.save();
+    });
+
+    await transactionSession.endSession();
+
+    await this.playerService.enhancePlayerValue(sourcePlayer);
+
+    return await this.getTeamByEmail({ email: destinationTeam.email });
   }
 }

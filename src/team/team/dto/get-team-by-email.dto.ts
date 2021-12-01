@@ -1,4 +1,5 @@
-import { IsBoolean, IsEmail, IsOptional } from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
+import { ClientSession } from 'mongoose';
 
 export class GetTeamByEmailDto {
   @IsEmail()
@@ -7,4 +8,8 @@ export class GetTeamByEmailDto {
   @IsOptional()
   @IsBoolean()
   getPassword?: boolean;
+
+  @IsOptional()
+  @IsNotEmpty()
+  session?: ClientSession;
 }

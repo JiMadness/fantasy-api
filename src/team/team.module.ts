@@ -7,8 +7,10 @@ import { PlayerService } from './player/player.service';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Team.name, schema: TeamSchema }]),
-    MongooseModule.forFeature([{ name: Player.name, schema: PlayerSchema }]),
+    MongooseModule.forFeature([
+      { name: Team.name, schema: TeamSchema },
+      { name: Player.name, schema: PlayerSchema },
+    ]),
   ],
   providers: [TeamService, PlayerService],
   exports: [TeamService],

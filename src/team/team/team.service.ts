@@ -9,6 +9,8 @@ import { getCode } from 'country-list';
 import { GetTeamByEmailDto } from './dto/get-team-by-email.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { TransferTeamPlayerDto } from './dto/transfer-team-player.dto';
+import { PlayerDocument } from '../player/player.schema';
+import { UpdateTeamPlayerDto } from './dto/update-team-player.dto';
 
 @Injectable()
 export class TeamService {
@@ -71,6 +73,17 @@ export class TeamService {
     return team.save();
   }
 
+  async updateTeamPlayer(updateTeamPlayerDto: UpdateTeamPlayerDto): Promise<PlayerDocument> {
+
+    const player = updateTeamPlayerDto.team.players.find((player) => player._id.equals(updateTeamPlayerDto.playerId));
+    return this.playerService.updatePlayer({
+      player,
+      firstName: updateTeamPlayerDto.firstName,
+      lastName: updateTeamPlayerDto.lastName,
+      country: updateTeamPlayerDto.country,
+    });
+  }
+
   async transferTeamPlayer(transferTeamPlayerDto: TransferTeamPlayerDto): Promise<TeamDocument> {
     const transactionSession = await this.connection.startSession();
 
@@ -82,7 +95,6 @@ export class TeamService {
         email: transferTeamPlayerDto.sourceTeamEmail,
         session: transactionSession,
       });
-      // @ts-expect-error
       sourcePlayer = sourceTeam.players.find((player) => player._id.equals(transferTeamPlayerDto.playerId));
 
       if (!sourcePlayer) {
@@ -98,7 +110,6 @@ export class TeamService {
         throw new Error('Cannot transfer player to own team.');
       }
 
-      // @ts-expect-error
       sourceTeam.players = sourceTeam.players.filter((player) => !player._id.equals(sourcePlayer._id));
       destinationTeam.players.push(sourcePlayer);
       sourceTeam.balance += transferTeamPlayerDto.sellPrice;

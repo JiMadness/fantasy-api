@@ -10,6 +10,7 @@ import { Market, MarketSchema } from './market.schema';
     TeamModule,
   ],
   providers: [MarketService],
+  exports: [MarketService],
 })
 export class MarketModule {
 }

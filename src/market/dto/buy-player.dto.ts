@@ -1,10 +1,11 @@
 import { Schema } from 'mongoose';
-import { IsEmail, IsInstance } from 'class-validator';
+import { IsInstance } from 'class-validator';
+import { Team, TeamDocument } from '../../team/team/team.schema';
 
 export class BuyPlayerDto {
   @IsInstance(Schema.Types.ObjectId)
   entryId: Schema.Types.ObjectId;
 
-  @IsEmail()
-  email: string;
+  @IsInstance(Team)
+  targetTeam: TeamDocument;
 }

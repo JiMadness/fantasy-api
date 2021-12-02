@@ -18,8 +18,7 @@ export class MarketService {
   }
 
   async placePlayerOnTransferList(placePlayerOnTransferListDto: PlacePlayerOnTransferListDto): Promise<MarketDocument> {
-    const targetTeam = await this.teamService.getTeamByEmail({ email: placePlayerOnTransferListDto.email });
-    // @ts-expect-error
+    const targetTeam = placePlayerOnTransferListDto.team;
     const targetPlayer = targetTeam.players.find((player) => player._id.equals(placePlayerOnTransferListDto.playerId));
 
     if (!targetPlayer) {
@@ -37,8 +36,8 @@ export class MarketService {
   async buyPlayer(transferPlayerDto: BuyPlayerDto): Promise<TeamDocument> {
     let entry = await this.marketModel.findById(transferPlayerDto.entryId);
     return this.teamService.transferTeamPlayer({
-      sourceTeamEmail: entry.ownerTeam._id,
-      destinationTeamEmail: transferPlayerDto.email,
+      sourceTeamEmail: entry.ownerTeam.email,
+      destinationTeamEmail: transferPlayerDto.targetTeam.email,
       playerId: entry.player._id,
       sellPrice: entry.askingPrice,
     });

@@ -1,6 +1,6 @@
 import { Document, Schema as MongooseSchema } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Player } from '../player/player.schema';
+import { Player, PlayerDocument } from '../player/player.schema';
 import { getCodes } from 'country-list';
 
 export type TeamDocument = Team & Document;
@@ -27,9 +27,10 @@ export class Team {
     default: [],
     required: true,
   })
-  players: Player[];
+  players: PlayerDocument[];
 
   value!: number;
+  email!: string;
 }
 
 export const TeamSchema = SchemaFactory.createForClass(Team);

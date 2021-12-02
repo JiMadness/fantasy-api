@@ -1,9 +1,10 @@
-import { IsEmail, IsInstance, IsNumber, Min } from 'class-validator';
+import { IsInstance, IsNumber, Min } from 'class-validator';
 import { Schema } from 'mongoose';
+import { Team, TeamDocument } from '../../team/team/team.schema';
 
 export class PlacePlayerOnTransferListDto {
-  @IsEmail()
-  email: string;
+  @IsInstance(Team)
+  team: TeamDocument;
 
   @IsInstance(Schema.Types.ObjectId)
   playerId: Schema.Types.ObjectId;

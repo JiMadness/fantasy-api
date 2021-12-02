@@ -117,7 +117,7 @@ export class PlayerService {
       player.lastName = updatePlayerDto.lastName;
     }
 
-    if (updatePlayerDto.firstName) {
+    if (updatePlayerDto.country) {
       player.country = getCode(updatePlayerDto.country);
     }
 

@@ -101,7 +101,7 @@ export class PlayerService {
   async enhancePlayerValue(enhancePlayerValueDto: EnhancePlayerValueDto): Promise<PlayerDocument> {
     const player = enhancePlayerValueDto.player;
 
-    player.value += Math.random() * player.value;
+    player.value += Math.floor(Math.random() * player.value);
 
     return player.save();
   }

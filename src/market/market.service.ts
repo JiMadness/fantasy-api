@@ -34,7 +34,7 @@ export class MarketService {
   }
 
   async buyPlayer(transferPlayerDto: BuyPlayerDto): Promise<TeamDocument> {
-    let entry = await this.marketModel.findById(transferPlayerDto.entryId);
+    let entry = await this.marketModel.findById(transferPlayerDto.entryId).populate('ownerTeam');
     return this.teamService.transferTeamPlayer({
       sourceTeamEmail: entry.ownerTeam.email,
       destinationTeamEmail: transferPlayerDto.targetTeam.email,

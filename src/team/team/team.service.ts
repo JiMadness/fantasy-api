@@ -121,7 +121,7 @@ export class TeamService {
 
     await transactionSession.endSession();
 
-    await this.playerService.enhancePlayerValue(sourcePlayer);
+    await this.playerService.enhancePlayerValue({ player: sourcePlayer });
 
     return await this.getTeamByEmail({ email: destinationTeam.email });
   }

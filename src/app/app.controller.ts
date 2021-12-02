@@ -45,8 +45,8 @@ export class AppController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('/team')
-  async updateTeam(@Body() body) {
-    const team = await this.teamService.updateTeam(body);
+  async updateTeam(@Request() req) {
+    const team = await this.teamService.updateTeam(Object.assign({ team: req.user }, req.body));
 
     return team.toObject();
   }

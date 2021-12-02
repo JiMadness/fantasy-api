@@ -15,6 +15,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    return { team: await this.teamService.getTeamByEmail({ email: payload.sub }) };
+    return await this.teamService.getTeamByEmail({ email: payload.sub });
   }
 }

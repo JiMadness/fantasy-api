@@ -56,7 +56,7 @@ export class TeamService {
   }
 
   async updateTeam(updateTeamDto: UpdateTeamDto): Promise<TeamDocument> {
-    const team = await this.getTeamByEmail({ email: updateTeamDto.email, getPassword: !!updateTeamDto.password });
+    const team = updateTeamDto.team;
 
     if (updateTeamDto.country) {
       team.country = getCode(updateTeamDto.country);

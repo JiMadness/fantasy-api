@@ -30,8 +30,17 @@ export class AppController {
   async createTeam(@Body() body) {
     body.password = body.password && await Bcrypt.hash(body.password, 10);
     const team = await this.teamService.create(body);
+    const result = team.toObject();
 
-    return team.toObject();
+    delete result.password;
+
+    return result;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/team')
+  getTeam(@Request() req) {
+    return req.user;
   }
 
   @UseGuards(JwtAuthGuard)

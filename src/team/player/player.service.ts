@@ -40,7 +40,7 @@ export class PlayerService {
 
   private generateRandomBirthYear(): number {
     return new Date().getFullYear() -
-      (Math.random() * (this.maximumPlayerAge - this.minimumPlayerAge) + this.minimumPlayerAge);
+      Math.floor(Math.random() * (this.maximumPlayerAge - this.minimumPlayerAge) + this.minimumPlayerAge);
   }
 
   private generateRandomCountryCode(): string {

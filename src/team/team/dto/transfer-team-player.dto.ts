@@ -1,5 +1,4 @@
-import { Schema } from 'mongoose';
-import { IsEmail, IsNotEmpty, IsNumber, Min } from 'class-validator';
+import { IsEmail, IsMongoId, IsNumber, Min } from 'class-validator';
 
 export class TransferTeamPlayerDto {
   @IsEmail()
@@ -8,8 +7,8 @@ export class TransferTeamPlayerDto {
   @IsEmail()
   destinationTeamEmail: string;
 
-  @IsNotEmpty()
-  playerId: Schema.Types.ObjectId;
+  @IsMongoId()
+  playerId: string;
 
   @IsNumber()
   @Min(0)

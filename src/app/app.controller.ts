@@ -6,6 +6,11 @@ import { MarketService } from '../market/market.service';
 import * as Bcrypt from 'bcrypt';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
+import { CreateTeamDto } from './dto/create-team.dto';
+import { UpdateTeamDto } from './dto/update-team.dto';
+import { UpdateTeamPlayerDto } from './dto/update-team-player.dto';
+import { PlacePlayerOnTransferListDto } from './dto/place-player-on-transfer-list.dto';
+import { TransferPlayerDto } from './dto/transfer-player.dto';
 
 @Controller()
 export class AppController {
@@ -27,7 +32,7 @@ export class AppController {
   }
 
   @Post('/team')
-  async createTeam(@Body() body) {
+  async createTeam(@Body() body: CreateTeamDto) {
     body.password = body.password && await Bcrypt.hash(body.password, 10);
     const team = await this.teamService.create(body);
     const result = team.toObject();
@@ -45,16 +50,16 @@ export class AppController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('/team')
-  async updateTeam(@Request() req) {
-    const team = await this.teamService.updateTeam(Object.assign({ team: req.user }, req.body));
+  async updateTeam(@Request() req, @Body() body: UpdateTeamDto) {
+    const team = await this.teamService.updateTeam(Object.assign({ team: req.user }, body));
 
     return team.toObject();
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('/team/player')
-  async updateTeamPlayer(@Request() req) {
-    const player = await this.teamService.updateTeamPlayer(Object.assign({ team: req.user }, req.body));
+  async updateTeamPlayer(@Request() req, @Body() body: UpdateTeamPlayerDto) {
+    const player = await this.teamService.updateTeamPlayer(Object.assign({ team: req.user }, body));
 
     return player.toObject();
   }
@@ -69,15 +74,15 @@ export class AppController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/market/list')
-  async placePlayerOnTransferList(@Request() req) {
-    const entry = await this.marketService.placePlayerOnTransferList(Object.assign({ team: req.user }, req.body));
+  async placePlayerOnTransferList(@Request() req, @Body() body: PlacePlayerOnTransferListDto) {
+    const entry = await this.marketService.placePlayerOnTransferList(Object.assign({ team: req.user }, body));
 
     return entry.toObject();
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('/market/transfer')
-  async transferPlayer(@Request() req) {
+  async transferPlayer(@Request() req, @Body() body: TransferPlayerDto) {
     const targetTeam = await this.marketService.buyPlayer(Object.assign({ targetTeam: req.user }, req.body));
 
     return targetTeam.toObject();

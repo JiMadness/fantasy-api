@@ -33,3 +33,6 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+## TODO
+1. Add unit tests

@@ -15,10 +15,16 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('/uptime (GET)', () => {
     return request(app.getHttpServer())
-      .get('/')
+      .get('/uptime')
       .expect(200)
-      .expect('Hello World!');
+      .expect((res => {
+        expect(+res.text).toBeGreaterThan(0);
+      }));
   });
 });

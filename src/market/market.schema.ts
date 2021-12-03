@@ -5,7 +5,9 @@ import { Team, TeamDocument } from '../team/team/team.schema';
 
 export type MarketDocument = Market & Document;
 
-@Schema()
+@Schema({
+  versionKey: false,
+})
 export class Market {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: Player.name, required: true, unique: true, autopopulate: true })
   player: PlayerDocument;

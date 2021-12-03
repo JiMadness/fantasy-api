@@ -5,7 +5,9 @@ import { getCodes } from 'country-list';
 
 export type PlayerDocument = Player & Document;
 
-@Schema()
+@Schema({
+  versionKey: false,
+})
 export class Player {
   _id!: MongooseSchema.Types.ObjectId;
 
@@ -32,7 +34,8 @@ export class Player {
 
 export const PlayerSchema = SchemaFactory.createForClass(Player);
 
-PlayerSchema.virtual('age').get(() => {
-  // @ts-expect-error
+PlayerSchema.virtual('age').get(function() {
   return new Date().getFullYear() - this.birthYear;
 });
+
+PlayerSchema.set('toObject', { virtuals: true });

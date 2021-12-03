@@ -40,7 +40,7 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   @Get('/team')
   getTeam(@Request() req) {
-    return req.user;
+    return req.user.toObject();
   }
 
   @UseGuards(JwtAuthGuard)

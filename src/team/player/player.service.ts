@@ -39,7 +39,7 @@ export class PlayerService {
   }
 
   private generateRandomBirthYear(): number {
-    return new Date().getFullYear() -
+    return new Date().getFullYear() - this.maximumPlayerAge +
       Math.floor(Math.random() * (this.maximumPlayerAge - this.minimumPlayerAge) + this.minimumPlayerAge);
   }
 

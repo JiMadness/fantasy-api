@@ -5,7 +5,9 @@ import { getCodes } from 'country-list';
 
 export type TeamDocument = Team & Document;
 
-@Schema()
+@Schema({
+  versionKey: false,
+})
 export class Team {
   @Prop({ lowercase: true, alias: 'email' })
   _id: string;
@@ -35,7 +37,8 @@ export class Team {
 
 export const TeamSchema = SchemaFactory.createForClass(Team);
 
-TeamSchema.virtual('value').get(() => {
-  // @ts-expect-error
+TeamSchema.virtual('value').get(function() {
   return this.players.reduce((acc, player) => acc + player.value, 0);
 });
+
+TeamSchema.set('toObject', { virtuals: true });

@@ -11,6 +11,10 @@ import { UpdateTeamDto } from './dto/update-team.dto';
 import { UpdateTeamPlayerDto } from './dto/update-team-player.dto';
 import { PlacePlayerOnTransferListDto } from './dto/place-player-on-transfer-list.dto';
 import { TransferPlayerDto } from './dto/transfer-player.dto';
+import { Team } from '../team/team/team.schema';
+import { LeanDocument } from 'mongoose';
+import { Player } from '../team/player/player.schema';
+import { Market } from '../market/market.schema';
 
 @Controller()
 export class AppController {
@@ -32,7 +36,7 @@ export class AppController {
   }
 
   @Post('/team')
-  async createTeam(@Body() body: CreateTeamDto) {
+  async createTeam(@Body() body: CreateTeamDto): Promise<LeanDocument<Team>> {
     body.password = body.password && await Bcrypt.hash(body.password, 10);
     const team = await this.teamService.create(body);
     const result = team.toObject();
@@ -44,13 +48,13 @@ export class AppController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/team')
-  getTeam(@Request() req) {
+  getTeam(@Request() req): Promise<LeanDocument<Team>> {
     return req.user.toObject();
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('/team')
-  async updateTeam(@Request() req, @Body() body: UpdateTeamDto) {
+  async updateTeam(@Request() req, @Body() body: UpdateTeamDto): Promise<LeanDocument<Team>> {
     const team = await this.teamService.updateTeam(Object.assign({ team: req.user }, body));
 
     return team.toObject();
@@ -58,7 +62,7 @@ export class AppController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('/team/player')
-  async updateTeamPlayer(@Request() req, @Body() body: UpdateTeamPlayerDto) {
+  async updateTeamPlayer(@Request() req, @Body() body: UpdateTeamPlayerDto): Promise<LeanDocument<Player>> {
     const player = await this.teamService.updateTeamPlayer(Object.assign({ team: req.user }, body));
 
     return player.toObject();
@@ -66,7 +70,7 @@ export class AppController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/market/list')
-  async getTransferList() {
+  async getTransferList(): Promise<LeanDocument<Market>[]> {
     const transferList = await this.marketService.getTransferList();
 
     return transferList.map((entry) => entry.toObject());
@@ -74,7 +78,7 @@ export class AppController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/market/list')
-  async placePlayerOnTransferList(@Request() req, @Body() body: PlacePlayerOnTransferListDto) {
+  async placePlayerOnTransferList(@Request() req, @Body() body: PlacePlayerOnTransferListDto): Promise<LeanDocument<Market>> {
     const entry = await this.marketService.placePlayerOnTransferList(Object.assign({ team: req.user }, body));
 
     return entry.toObject();
@@ -82,7 +86,7 @@ export class AppController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/market/transfer')
-  async transferPlayer(@Request() req, @Body() body: TransferPlayerDto) {
+  async transferPlayer(@Request() req, @Body() body: TransferPlayerDto): Promise<LeanDocument<Team>> {
     const targetTeam = await this.marketService.buyPlayer(Object.assign({ targetTeam: req.user }, req.body));
 
     return targetTeam.toObject();

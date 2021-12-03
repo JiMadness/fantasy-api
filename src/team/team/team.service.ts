@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Team, TeamDocument } from './team.schema';
 import { Connection, Model } from 'mongoose';
@@ -49,7 +49,7 @@ export class TeamService {
     team = await teamPromise;
 
     if (!team) {
-      throw new Error('Team not found.');
+      throw new NotFoundException('Team not found.');
     }
 
     return team;
@@ -98,7 +98,7 @@ export class TeamService {
       sourcePlayer = sourceTeam.players.find((player) => player._id.equals(transferTeamPlayerDto.playerId));
 
       if (!sourcePlayer) {
-        throw new Error('Player not found in team.');
+        throw new NotFoundException('Player not found in team.');
       }
 
       destinationTeam = await this.getTeamByEmail({
@@ -107,7 +107,7 @@ export class TeamService {
       });
 
       if (sourceTeam.equals(destinationTeam)) {
-        throw new Error('Cannot transfer player to own team.');
+        throw new ConflictException('Cannot transfer player to own team.');
       }
 
       sourceTeam.players = sourceTeam.players.filter((player) => !player._id.equals(sourcePlayer._id));

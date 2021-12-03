@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Market, MarketDocument } from './market.schema';
 import { Model } from 'mongoose';
@@ -22,7 +22,7 @@ export class MarketService {
     const targetPlayer = targetTeam.players.find((player) => player._id.equals(placePlayerOnTransferListDto.playerId));
 
     if (!targetPlayer) {
-      throw new Error('Player not found within team.');
+      throw new NotFoundException('Player not found within team.');
     }
     const entry = new this.marketModel({
       player: targetPlayer,
@@ -35,6 +35,11 @@ export class MarketService {
 
   async buyPlayer(transferPlayerDto: BuyPlayerDto): Promise<TeamDocument> {
     let entry = await this.marketModel.findById(transferPlayerDto.entryId).populate('ownerTeam');
+
+    if (!entry) {
+      throw new NotFoundException('Market entry not found.');
+    }
+
     const updatedTeam = this.teamService.transferTeamPlayer({
       sourceTeamEmail: entry.ownerTeam.email,
       destinationTeamEmail: transferPlayerDto.targetTeam.email,

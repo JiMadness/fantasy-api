@@ -40,7 +40,7 @@ export class MarketService {
       throw new NotFoundException('Market entry not found.');
     }
 
-    const updatedTeam = this.teamService.transferTeamPlayer({
+    const updatedTeam = await this.teamService.transferTeamPlayer({
       sourceTeamEmail: entry.ownerTeam.email,
       destinationTeamEmail: transferPlayerDto.targetTeam.email,
       playerId: entry.player._id,

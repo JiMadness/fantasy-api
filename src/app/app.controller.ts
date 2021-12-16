@@ -57,8 +57,11 @@ export class AppController {
   async updateTeam(@Request() req, @Body() body: UpdateTeamDto): Promise<LeanDocument<Team>> {
     body.password = body.password && await Bcrypt.hash(body.password, 10);
     const team = await this.teamService.updateTeam(Object.assign({ team: req.user }, body));
+    const result =  team.toObject();
 
-    return team.toObject();
+    delete result.password;
+
+    return result;
   }
 
   @UseGuards(JwtAuthGuard)
